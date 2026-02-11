@@ -2,38 +2,42 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>WhatsApp · Sheets</title>
-  <!-- Font Awesome 6 -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=yes, viewport-fit=cover">
+  <title>WhatsApp Premium · Sheets</title>
+  <!-- Font Awesome 6 (icons) -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <!-- Google Font: Inter (clean, modern) -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
   <style>
-    /* ----- GLOBAL – EXACT WHATSAPP DARK THEME, MOBILE FIRST ----- */
+    /* ---------- GLOBAL – PREMIUM DARK THEME, FULLY RESPONSIVE ---------- */
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
     }
+
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
       background: #0b141a;
       height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
-    }
-    #app {
-      width: 100%;
-      max-width: 500px;
-      height: 100vh;
-      background: #111b21;
-      box-shadow: 0 0 20px rgba(0,0,0,0.5);
-      position: relative;
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
+      line-height: 1.5;
     }
 
-    /* ----- AUTH SCREEN (login / register) ----- */
+    #app {
+      width: 100%;
+      height: 100vh;
+      background: #111b21;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* ----- AUTH SCREEN (unchanged, clean) ----- */
     #auth-container {
       height: 100%;
       display: flex;
@@ -46,13 +50,15 @@
     .auth-card {
       background: #1f2c34;
       width: 100%;
-      border-radius: 16px;
-      padding: 24px;
+      max-width: 440px;
+      border-radius: 24px;
+      padding: 32px;
       color: white;
+      box-shadow: 0 12px 28px rgba(0,0,0,0.5);
     }
     .auth-tabs {
       display: flex;
-      margin-bottom: 24px;
+      margin-bottom: 28px;
       border-bottom: 1px solid #2a3942;
     }
     .auth-tab {
@@ -62,75 +68,78 @@
       font-weight: 600;
       color: #8696a0;
       cursor: pointer;
+      transition: all 0.2s;
     }
     .auth-tab.active {
       color: #00a884;
-      border-bottom: 2px solid #00a884;
+      border-bottom: 3px solid #00a884;
     }
     .auth-form {
       display: none;
       flex-direction: column;
     }
-    .auth-form.active {
-      display: flex;
-    }
+    .auth-form.active { display: flex; }
     .auth-form h2 {
       margin-bottom: 24px;
       color: #00a884;
-      font-size: 1.6rem;
+      font-size: 1.8rem;
+      font-weight: 600;
     }
     .input-group {
-      margin-bottom: 16px;
+      margin-bottom: 18px;
       position: relative;
     }
     .input-group i {
       position: absolute;
-      left: 14px;
-      top: 14px;
+      left: 16px;
+      top: 16px;
       color: #8696a0;
+      font-size: 16px;
     }
     .input-group input {
       width: 100%;
-      padding: 14px 14px 14px 44px;
+      padding: 16px 16px 16px 48px;
       background: #2a3942;
       border: 1px solid #3a4a53;
-      border-radius: 8px;
+      border-radius: 12px;
       font-size: 16px;
       color: white;
       outline: none;
+      transition: border 0.2s;
     }
-    .input-group input::placeholder {
-      color: #8696a0;
+    .input-group input:focus {
+      border-color: #00a884;
     }
+    .input-group input::placeholder { color: #8696a0; }
     .btn {
       background: #00a884;
       color: white;
       border: none;
-      padding: 14px;
-      border-radius: 8px;
+      padding: 16px;
+      border-radius: 12px;
       font-size: 16px;
       font-weight: 600;
       cursor: pointer;
-      margin-top: 8px;
-    }
-    .error-message {
-      color: #ff6b6b;
-      font-size: 14px;
       margin-top: 12px;
-      text-align: center;
+      transition: background 0.2s, transform 0.1s;
     }
+    .btn:hover { background: #0b7a6b; transform: scale(1.01); }
+    .error-message { color: #ff6b6b; font-size: 14px; margin-top: 12px; text-align: center; }
 
-    /* ----- MAIN APP (after login) ----- */
+    /* ----- MAIN APP – RESPONSIVE GRID (mobile first, desktop upgrade) ----- */
     #main-container {
       display: none;
       flex-direction: column;
       height: 100%;
+      width: 100%;
       background: #111b21;
       color: white;
     }
+
+    /* Mobile layout: stacked */
     .app-header {
       background: #1f2c34;
-      padding: 16px;
+      padding: 16px 20px;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -142,17 +151,18 @@
       gap: 12px;
     }
     .avatar {
-      width: 42px;
-      height: 42px;
+      width: 44px;
+      height: 44px;
       border-radius: 50%;
-      background: #00a884;
+      background: linear-gradient(145deg, #00a884, #0b7a6b);
       color: white;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-weight: 600;
-      font-size: 18px;
+      font-weight: 700;
+      font-size: 20px;
       text-transform: uppercase;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
     }
     .app-tabs {
       display: flex;
@@ -166,12 +176,14 @@
       background: none;
       border: none;
       color: #8696a0;
-      font-size: 16px;
+      font-size: 15px;
       font-weight: 600;
-      padding: 8px;
-      border-radius: 20px;
+      padding: 10px;
+      border-radius: 30px;
       cursor: pointer;
+      transition: 0.2s;
     }
+    .tab-btn i { margin-right: 6px; }
     .tab-btn.active {
       background: #2a3942;
       color: white;
@@ -180,48 +192,46 @@
       display: none;
       flex: 1;
       overflow-y: auto;
-      padding: 12px;
+      padding: 16px;
+      background: #111b21;
     }
-    .tab-pane.active {
-      display: block;
-    }
+    .tab-pane.active { display: block; }
 
-    /* ----- CHATS LIST (inbox) ----- */
+    /* ----- CHATS LIST (Inbox) ----- */
     .conversation-item {
       display: flex;
       align-items: center;
-      padding: 12px;
-      gap: 12px;
+      padding: 12px 16px;
+      gap: 16px;
       cursor: pointer;
-      border-bottom: 1px solid #2a3942;
+      border-radius: 16px;
+      transition: background 0.2s;
+      margin-bottom: 4px;
     }
-    .conversation-item:hover {
-      background: #1f2c34;
-    }
+    .conversation-item:hover { background: #1f2c34; }
     .conv-avatar {
-      width: 50px;
-      height: 50px;
+      width: 56px;
+      height: 56px;
       border-radius: 50%;
-      background: #00a884;
+      background: linear-gradient(145deg, #128C7E, #075E54);
       color: white;
       display: flex;
       align-items: center;
       justify-content: center;
       font-weight: 600;
-      font-size: 20px;
+      font-size: 22px;
+      text-transform: uppercase;
     }
-    .conv-details {
-      flex: 1;
-      overflow: hidden;
-    }
+    .conv-details { flex: 1; overflow: hidden; }
     .conv-top {
       display: flex;
       justify-content: space-between;
-      margin-bottom: 4px;
+      margin-bottom: 6px;
     }
     .conv-name {
       font-weight: 600;
       color: white;
+      font-size: 16px;
     }
     .conv-time {
       font-size: 12px;
@@ -235,16 +245,17 @@
       text-overflow: ellipsis;
     }
 
-    /* ----- CHAT WINDOW (inside main) ----- */
+    /* ----- CHAT WINDOW (right panel) ----- */
     .chat-window {
       display: none;
       flex-direction: column;
       height: 100%;
       background: #0b141a;
+      border-left: 1px solid #2a3942;
     }
     .chat-header {
       background: #1f2c34;
-      padding: 12px 16px;
+      padding: 12px 20px;
       display: flex;
       align-items: center;
       gap: 16px;
@@ -254,14 +265,13 @@
       background: none;
       border: none;
       color: white;
-      font-size: 20px;
+      font-size: 22px;
       cursor: pointer;
+      display: none; /* hidden on desktop, shown on mobile */
     }
-    .chat-contact-info {
-      flex: 1;
-    }
+    .chat-contact-info { flex: 1; }
     .chat-contact-name {
-      font-weight: 600;
+      font-weight: 700;
       font-size: 18px;
       color: white;
     }
@@ -271,47 +281,54 @@
       color: #8696a0;
       font-size: 18px;
       cursor: pointer;
-      margin-left: auto;
+      padding: 8px;
+      border-radius: 50%;
+      transition: background 0.2s;
     }
+    .refresh-btn:hover { background: #2a3942; }
     .messages-area {
       flex: 1;
-      padding: 16px;
+      padding: 20px;
       overflow-y: auto;
       display: flex;
       flex-direction: column;
       background: #0b141a;
+      background-image: radial-gradient(rgba(42,57,66,0.3) 1px, transparent 1px);
+      background-size: 8px 8px;
     }
     .message-bubble {
-      max-width: 80%;
-      padding: 10px 14px;
-      border-radius: 12px;
-      margin-bottom: 8px;
+      max-width: 75%;
+      padding: 12px 16px;
+      border-radius: 18px;
+      margin-bottom: 10px;
       word-wrap: break-word;
       position: relative;
       font-size: 15px;
+      line-height: 1.4;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.1);
     }
     .message-sent {
       align-self: flex-end;
       background: #005c4b;
       color: white;
-      border-bottom-right-radius: 2px;
+      border-bottom-right-radius: 4px;
     }
     .message-received {
       align-self: flex-start;
       background: #1f2c34;
       color: white;
-      border-bottom-left-radius: 2px;
+      border-bottom-left-radius: 4px;
     }
     .message-time {
       font-size: 11px;
       color: #8696a0;
-      margin-top: 4px;
+      margin-top: 6px;
       text-align: right;
     }
     .message-footer {
       display: flex;
-      gap: 8px;
-      margin-top: 4px;
+      gap: 12px;
+      margin-top: 6px;
       justify-content: flex-end;
     }
     .message-action {
@@ -320,40 +337,42 @@
       color: #8696a0;
       font-size: 12px;
       cursor: pointer;
+      padding: 4px 6px;
+      border-radius: 12px;
+      transition: background 0.2s;
     }
-    .edited-badge {
-      font-size: 11px;
-      color: #8696a0;
-      margin-left: 4px;
-    }
+    .message-action:hover { background: #2a3942; }
+    .edited-badge { font-size: 11px; color: #8696a0; margin-left: 4px; }
     .reactions-row {
       display: flex;
-      gap: 4px;
-      margin-top: 4px;
+      gap: 6px;
+      margin-top: 6px;
       flex-wrap: wrap;
     }
     .reaction-item {
       background: #2a3942;
-      border-radius: 12px;
-      padding: 2px 8px;
+      border-radius: 20px;
+      padding: 4px 10px;
       font-size: 13px;
       display: inline-flex;
       align-items: center;
-      gap: 4px;
+      gap: 6px;
       cursor: pointer;
+      transition: background 0.2s;
     }
+    .reaction-item:hover { background: #3a4a53; }
     .chat-input-area {
       background: #1f2c34;
-      padding: 12px 16px;
+      padding: 12px 20px;
       display: flex;
       gap: 12px;
       align-items: center;
     }
     .chat-input-area input {
       flex: 1;
-      padding: 12px 16px;
+      padding: 14px 18px;
       border: none;
-      border-radius: 24px;
+      border-radius: 28px;
       background: #2a3942;
       color: white;
       font-size: 16px;
@@ -363,34 +382,40 @@
       background: #00a884;
       color: white;
       border: none;
-      width: 44px;
-      height: 44px;
+      width: 50px;
+      height: 50px;
       border-radius: 50%;
-      font-size: 18px;
+      font-size: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       cursor: pointer;
+      transition: background 0.2s;
     }
+    .chat-input-area button:hover { background: #0b7a6b; }
 
-    /* ----- CONTACTS TAB ----- */
+    /* ----- CONTACTS TAB (with chat & remove buttons) ----- */
     .search-section {
       display: flex;
-      gap: 8px;
-      margin-bottom: 16px;
+      gap: 12px;
+      margin-bottom: 24px;
     }
     .search-section input {
       flex: 1;
-      padding: 12px;
+      padding: 14px 18px;
       background: #2a3942;
       border: 1px solid #3a4a53;
-      border-radius: 8px;
+      border-radius: 28px;
       color: white;
       font-size: 16px;
+      outline: none;
     }
     .search-section button {
       background: #00a884;
       color: white;
       border: none;
-      padding: 12px 16px;
-      border-radius: 8px;
+      padding: 14px 24px;
+      border-radius: 28px;
       font-weight: 600;
       cursor: pointer;
     }
@@ -398,154 +423,239 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 12px;
-      border-bottom: 1px solid #2a3942;
+      padding: 16px;
+      background: #1f2c34;
+      border-radius: 18px;
+      margin-bottom: 10px;
+      transition: transform 0.2s;
     }
+    .contact-item:hover { transform: translateY(-2px); background: #2a3942; }
     .contact-info {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 16px;
     }
     .contact-avatar {
-      width: 40px;
-      height: 40px;
+      width: 52px;
+      height: 52px;
       border-radius: 50%;
-      background: #00a884;
+      background: linear-gradient(145deg, #128C7E, #075E54);
       color: white;
       display: flex;
       align-items: center;
       justify-content: center;
       font-weight: 600;
+      font-size: 22px;
     }
-    .contact-details {
-      color: white;
-    }
+    .contact-details { color: white; }
     .contact-name {
-      font-weight: 600;
+      font-weight: 700;
+      font-size: 17px;
+      margin-bottom: 4px;
     }
-    .contact-email {
-      font-size: 12px;
-      color: #8696a0;
+    .contact-email { font-size: 13px; color: #8696a0; }
+    .contact-actions {
+      display: flex;
+      gap: 12px;
     }
-    .remove-contact {
+    .chat-contact-btn, .remove-contact {
       background: none;
       border: none;
-      color: #ff6b6b;
-      font-size: 16px;
+      color: #8696a0;
+      font-size: 20px;
       cursor: pointer;
+      padding: 8px;
+      border-radius: 50%;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
+    .chat-contact-btn { color: #00a884; }
+    .chat-contact-btn:hover { background: #075E54; color: white; }
+    .remove-contact:hover { background: #ff6b6b; color: white; }
 
     /* ----- PROFILE TAB ----- */
     .profile-card {
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 24px;
+      padding: 32px 20px;
+      background: #1f2c34;
+      border-radius: 28px;
+      margin: 16px;
     }
     .profile-avatar {
-      width: 100px;
-      height: 100px;
+      width: 120px;
+      height: 120px;
       border-radius: 50%;
-      background: #00a884;
+      background: linear-gradient(145deg, #00a884, #0b7a6b);
       color: white;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 48px;
+      font-size: 54px;
       font-weight: 600;
-      margin-bottom: 16px;
+      margin-bottom: 24px;
+      box-shadow: 0 6px 14px rgba(0,0,0,0.3);
     }
     .profile-field {
       width: 100%;
-      padding: 12px;
-      background: #1f2c34;
-      border-radius: 8px;
-      margin-bottom: 12px;
+      padding: 18px;
+      background: #2a3942;
+      border-radius: 16px;
+      margin-bottom: 16px;
       color: white;
     }
     .profile-field label {
       display: block;
-      font-size: 12px;
+      font-size: 13px;
       color: #8696a0;
-      margin-bottom: 4px;
+      margin-bottom: 6px;
     }
-    .profile-field div {
-      font-size: 16px;
-    }
+    .profile-field div { font-size: 18px; font-weight: 500; }
     .logout-btn {
       background: #ff6b6b;
       color: white;
       border: none;
-      padding: 14px;
-      border-radius: 8px;
-      font-size: 16px;
+      padding: 16px;
+      border-radius: 16px;
+      font-size: 17px;
       font-weight: 600;
       cursor: pointer;
       width: 100%;
-      margin-top: 24px;
+      margin-top: 16px;
+      transition: background 0.2s;
     }
+    .logout-btn:hover { background: #ff5252; }
 
-    /* ----- MODALS (search result & reactions) ----- */
+    /* ----- MODALS (premium) ----- */
     .modal {
       display: none;
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
+      top: 0; left: 0; right: 0; bottom: 0;
       background: rgba(0,0,0,0.7);
       align-items: center;
       justify-content: center;
-      z-index: 2000;
+      z-index: 3000;
+      backdrop-filter: blur(6px);
     }
-    .modal.active {
-      display: flex;
-    }
+    .modal.active { display: flex; }
     .modal-content {
       background: #1f2c34;
       width: 90%;
-      max-width: 400px;
-      border-radius: 16px;
-      padding: 24px;
+      max-width: 440px;
+      border-radius: 28px;
+      padding: 28px;
       color: white;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.5);
     }
     .modal-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 20px;
+      margin-bottom: 24px;
     }
     .modal-header h3 {
       color: #00a884;
+      font-size: 22px;
     }
     .close-btn {
       background: none;
       border: none;
       color: white;
-      font-size: 24px;
+      font-size: 28px;
       cursor: pointer;
     }
     .user-result {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 12px;
+      padding: 16px;
       background: #2a3942;
-      border-radius: 8px;
+      border-radius: 18px;
     }
     .reaction-picker {
       display: flex;
       justify-content: space-around;
-      font-size: 30px;
-      margin: 20px 0;
+      font-size: 36px;
+      margin: 24px 0;
     }
     .reaction-picker span {
       cursor: pointer;
-      transition: transform 0.1s;
+      transition: transform 0.2s;
     }
-    .reaction-picker span:hover {
-      transform: scale(1.2);
+    .reaction-picker span:hover { transform: scale(1.3); }
+
+    /* ---------- DESKTOP LAYOUT (min-width: 900px) – SIDE BY SIDE ---------- */
+    @media (min-width: 900px) {
+      #main-container {
+        display: grid;
+        grid-template-columns: minmax(360px, 30%) 1fr;
+        grid-template-rows: auto auto 1fr;
+      }
+      .app-header { grid-column: 1 / -1; }
+      .app-tabs { grid-column: 1; }
+      .tab-pane {
+        grid-column: 1;
+        grid-row: 3;
+        height: 100%;
+        overflow-y: auto;
+        padding-bottom: 0;
+      }
+      .chat-window {
+        grid-column: 2;
+        grid-row: 2 / 4;
+        display: flex; /* always visible, but content depends on selectedContact */
+        border-left: 1px solid #2a3942;
+      }
+      /* Hide back button on desktop */
+      .back-btn { display: none; }
+      /* Show chat window even if no contact selected – show placeholder */
+      .chat-window:has(.chat-contact-name:empty) .messages-area {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: #8696a0;
+        font-size: 16px;
+      }
     }
+
+    /* Mobile adjustments: back button visible, chat window overlays */
+    @media (max-width: 899px) {
+      .back-btn { display: block; }
+      /* When chat window is open on mobile, hide the left column */
+      .chat-window.active-mobile {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 100;
+        background: #0b141a;
+        display: flex;
+      }
+      .chat-window:not(.active-mobile) { display: none; }
+    }
+
+    /* Placeholder for no chat on desktop */
+    .no-chat-placeholder {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      color: #8696a0;
+      font-size: 18px;
+      gap: 16px;
+    }
+    .no-chat-placeholder i { font-size: 64px; color: #00a884; }
+
+    /* Smooth scrolling */
+    .messages-area, .tab-pane { scrollbar-width: thin; scrollbar-color: #2a3942 #111b21; }
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #111b21; }
+    ::-webkit-scrollbar-thumb { background: #2a3942; border-radius: 8px; }
   </style>
 </head>
 <body>
@@ -560,36 +670,18 @@
       <!-- Login Form -->
       <div id="login-form" class="auth-form active">
         <h2>Sign in</h2>
-        <div class="input-group">
-          <i class="fas fa-envelope"></i>
-          <input type="email" id="login-email" placeholder="Email" autocomplete="email">
-        </div>
-        <div class="input-group">
-          <i class="fas fa-lock"></i>
-          <input type="password" id="login-password" placeholder="Password">
-        </div>
+        <div class="input-group"><i class="fas fa-envelope"></i><input type="email" id="login-email" placeholder="Email" autocomplete="email"></div>
+        <div class="input-group"><i class="fas fa-lock"></i><input type="password" id="login-password" placeholder="Password"></div>
         <button class="btn" onclick="handleLogin()">Login</button>
         <div id="login-error" class="error-message"></div>
       </div>
       <!-- Register Form (with mobile) -->
       <div id="register-form" class="auth-form">
         <h2>Create account</h2>
-        <div class="input-group">
-          <i class="fas fa-user"></i>
-          <input type="text" id="reg-name" placeholder="Full name">
-        </div>
-        <div class="input-group">
-          <i class="fas fa-envelope"></i>
-          <input type="email" id="reg-email" placeholder="Email">
-        </div>
-        <div class="input-group">
-          <i class="fas fa-mobile-alt"></i>
-          <input type="tel" id="reg-mobile" placeholder="Mobile number">
-        </div>
-        <div class="input-group">
-          <i class="fas fa-lock"></i>
-          <input type="password" id="reg-password" placeholder="Password">
-        </div>
+        <div class="input-group"><i class="fas fa-user"></i><input type="text" id="reg-name" placeholder="Full name"></div>
+        <div class="input-group"><i class="fas fa-envelope"></i><input type="email" id="reg-email" placeholder="Email"></div>
+        <div class="input-group"><i class="fas fa-mobile-alt"></i><input type="tel" id="reg-mobile" placeholder="Mobile number"></div>
+        <div class="input-group"><i class="fas fa-lock"></i><input type="password" id="reg-password" placeholder="Password"></div>
         <button class="btn" onclick="handleRegister()">Register</button>
         <div id="register-error" class="error-message"></div>
       </div>
@@ -598,34 +690,28 @@
 
   <!-- ========== MAIN APP (after login) ========== -->
   <div id="main-container">
-    <!-- Header with refresh button -->
+    <!-- Header with refresh & avatar -->
     <div class="app-header">
       <div class="app-header-left">
         <div class="avatar" id="header-avatar"></div>
-        <span id="header-name">WhatsApp</span>
+        <span id="header-name" style="font-weight:600; font-size:18px;">WhatsApp</span>
       </div>
-      <i class="fas fa-sync-alt" style="color:#8696a0; font-size:20px; cursor:pointer;" onclick="manualRefresh()"></i>
+      <i class="fas fa-sync-alt" style="color:#8696a0; font-size:20px; cursor:pointer; padding:8px; border-radius:50%;" onclick="manualRefresh()"></i>
     </div>
 
     <!-- Tabs: Chats / Contacts / Profile -->
     <div class="app-tabs">
-      <button id="tab-chats-btn" class="tab-btn active" onclick="switchTab('chats')">
-        <i class="fas fa-comment"></i> Chats
-      </button>
-      <button id="tab-contacts-btn" class="tab-btn" onclick="switchTab('contacts')">
-        <i class="fas fa-address-book"></i> Contacts
-      </button>
-      <button id="tab-profile-btn" class="tab-btn" onclick="switchTab('profile')">
-        <i class="fas fa-user"></i> Profile
-      </button>
+      <button id="tab-chats-btn" class="tab-btn active" onclick="switchTab('chats')"><i class="fas fa-comment"></i> Chats</button>
+      <button id="tab-contacts-btn" class="tab-btn" onclick="switchTab('contacts')"><i class="fas fa-address-book"></i> Contacts</button>
+      <button id="tab-profile-btn" class="tab-btn" onclick="switchTab('profile')"><i class="fas fa-user"></i> Profile</button>
     </div>
 
-    <!-- CHATS TAB -->
+    <!-- CHATS TAB (left panel) -->
     <div id="chats-pane" class="tab-pane active">
       <div id="conversations-list"></div>
     </div>
 
-    <!-- CONTACTS TAB -->
+    <!-- CONTACTS TAB (left panel) -->
     <div id="contacts-pane" class="tab-pane">
       <div class="search-section">
         <input type="text" id="contact-search-input" placeholder="Search by email, mobile or name">
@@ -634,7 +720,7 @@
       <div id="contacts-list"></div>
     </div>
 
-    <!-- PROFILE TAB -->
+    <!-- PROFILE TAB (left panel) -->
     <div id="profile-pane" class="tab-pane">
       <div class="profile-card">
         <div class="profile-avatar" id="profile-avatar"></div>
@@ -645,16 +731,22 @@
       </div>
     </div>
 
-    <!-- CHAT WINDOW (hidden by default) -->
+    <!-- RIGHT PANEL – CHAT WINDOW (visible on desktop always, on mobile only when opened) -->
     <div id="chat-window" class="chat-window">
       <div class="chat-header">
         <button class="back-btn" onclick="closeChatWindow()"><i class="fas fa-arrow-left"></i></button>
         <div class="chat-contact-info">
-          <div class="chat-contact-name" id="chat-contact-name">Contact</div>
+          <div class="chat-contact-name" id="chat-contact-name"></div>
         </div>
         <button class="refresh-btn" onclick="loadMessages()"><i class="fas fa-sync-alt"></i></button>
       </div>
-      <div class="messages-area" id="messages-area"></div>
+      <div class="messages-area" id="messages-area">
+        <!-- Default placeholder for desktop -->
+        <div class="no-chat-placeholder">
+          <i class="fas fa-comments"></i>
+          <p>Select a chat to start messaging</p>
+        </div>
+      </div>
       <div class="chat-input-area">
         <input type="text" id="message-input" placeholder="Type a message" autocomplete="off">
         <button onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
@@ -662,7 +754,7 @@
     </div>
   </div>
 
-  <!-- ========== MODAL: User search result (add contact) ========== -->
+  <!-- ========== MODAL: Search result (add contact) ========== -->
   <div id="searchResultModal" class="modal">
     <div class="modal-content">
       <div class="modal-header">
@@ -694,7 +786,7 @@
 
 <script>
   // ========== 🔥 YOUR GOOGLE APPS SCRIPT URL – REPLACE THIS ==========
-  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwdS7JFQOvp5H3oQK4Lvg0rS9_qWftn_-LAqg7qMcPQNLu-yDHQRVcGDfB_-vXlPsrSeg/exec';  // <-- PASTE YOUR URL HERE
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwdS7JFQOvp5H3oQK4Lvg0rS9_qWftn_-LAqg7qMcPQNLu-yDHQRVcGDfB_-vXlPsrSeg/exec';  // <-- PASTE YOUR DEPLOYED URL HERE
 
   // ---------- GLOBAL STATE ----------
   let currentUser = null;
@@ -704,7 +796,7 @@
   let currentMessageId = null;
   let replyToMessage = null;
 
-  // ---------- API REQUEST (NO CORS PREFLIGHT, BETTER ERROR HANDLING) ----------
+  // ---------- API REQUEST (NO CORS PREFLIGHT, PREMIUM ERROR HANDLING) ----------
   async function apiRequest(action, payload) {
     try {
       const res = await fetch(SCRIPT_URL, {
@@ -735,6 +827,11 @@
     if (res.success) {
       showError('register-error', '✅ Registration successful! Please login.');
       document.getElementById('login-tab').click();
+      // Clear fields
+      document.getElementById('reg-name').value = '';
+      document.getElementById('reg-email').value = '';
+      document.getElementById('reg-mobile').value = '';
+      document.getElementById('reg-password').value = '';
     } else {
       showError('register-error', res.message);
     }
@@ -749,10 +846,13 @@
       currentUser = res.user;
       localStorage.setItem('whatsapp_user', JSON.stringify(currentUser));
       document.getElementById('auth-container').style.display = 'none';
-      document.getElementById('main-container').style.display = 'flex';
+      document.getElementById('main-container').style.display = 'grid';
       updateUIAfterLogin();
       loadConversations();
       loadContacts();
+      // Reset chat window
+      selectedContact = null;
+      updateChatWindowForDesktop();
     } else {
       showError('login-error', res.message);
     }
@@ -775,6 +875,43 @@
     document.getElementById('auth-container').style.display = 'flex';
   }
 
+  // ---------- RESPONSIVE LAYOUT HELPERS ----------
+  function isMobile() {
+    return window.innerWidth < 900;
+  }
+
+  // Update chat window visibility based on screen size and selected contact
+  function updateChatWindowForDesktop() {
+    const chatWindow = document.getElementById('chat-window');
+    if (!isMobile()) {
+      // Desktop: always show chat window, but with content or placeholder
+      chatWindow.style.display = 'flex';
+      if (selectedContact) {
+        document.querySelector('.no-chat-placeholder')?.style.display = 'none';
+        document.getElementById('chat-contact-name').innerText = selectedContact.name;
+        document.getElementById('chat-input-area').style.display = 'flex';
+        loadMessages();
+      } else {
+        // Show placeholder
+        document.getElementById('chat-contact-name').innerText = '';
+        document.getElementById('messages-area').innerHTML = `<div class="no-chat-placeholder"><i class="fas fa-comments"></i><p>Select a chat to start messaging</p></div>`;
+        document.getElementById('chat-input-area').style.display = 'none';
+      }
+    } else {
+      // Mobile: chat window is hidden by default, shown when selectedContact exists
+      if (selectedContact) {
+        chatWindow.classList.add('active-mobile');
+        chatWindow.style.display = 'flex';
+        document.getElementById('chat-contact-name').innerText = selectedContact.name;
+        document.getElementById('chat-input-area').style.display = 'flex';
+        loadMessages();
+      } else {
+        chatWindow.classList.remove('active-mobile');
+        chatWindow.style.display = 'none';
+      }
+    }
+  }
+
   // ---------- TAB SWITCHING ----------
   function switchTab(tab) {
     document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
@@ -782,14 +919,17 @@
     if (tab === 'chats') {
       document.getElementById('tab-chats-btn').classList.add('active');
       document.getElementById('chats-pane').classList.add('active');
-      closeChatWindow();
     } else if (tab === 'contacts') {
       document.getElementById('tab-contacts-btn').classList.add('active');
       document.getElementById('contacts-pane').classList.add('active');
-      loadContacts();
+      loadContacts(); // refresh contacts
     } else if (tab === 'profile') {
       document.getElementById('tab-profile-btn').classList.add('active');
       document.getElementById('profile-pane').classList.add('active');
+    }
+    // On mobile, close chat window if switching tabs
+    if (isMobile() && selectedContact) {
+      closeChatWindow();
     }
   }
 
@@ -806,16 +946,17 @@
   function renderConversations() {
     const container = document.getElementById('conversations-list');
     if (!conversations.length) {
-      container.innerHTML = '<div style="color:#8696a0; text-align:center; padding:32px;">No chats yet</div>';
+      container.innerHTML = '<div style="color:#8696a0; text-align:center; padding:40px;"><i class="fas fa-inbox" style="font-size:48px; margin-bottom:16px;"></i><p>No chats yet</p><p style="font-size:14px;">Start a new conversation from Contacts</p></div>';
       return;
     }
     let html = '';
     conversations.forEach(conv => {
-      html += `<div class="conversation-item" onclick="openChat('${conv.otherEmail}', '${conv.otherName}')">
+      const activeClass = (selectedContact && selectedContact.email === conv.otherEmail) ? 'active' : '';
+      html += `<div class="conversation-item ${activeClass}" onclick="openChat('${conv.otherEmail}', '${conv.otherName}')">
         <div class="conv-avatar">${conv.otherName.charAt(0)}</div>
         <div class="conv-details">
           <div class="conv-top"><span class="conv-name">${escapeHTML(conv.otherName)}</span><span class="conv-time">${formatTime(conv.timestamp)}</span></div>
-          <div class="conv-last-msg">${escapeHTML(conv.lastMessage.substring(0, 30))}${conv.lastMessage.length > 30 ? '…' : ''}</div>
+          <div class="conv-last-msg">${escapeHTML(conv.lastMessage.substring(0, 35))}${conv.lastMessage.length > 35 ? '…' : ''}</div>
         </div>
       </div>`;
     });
@@ -825,16 +966,41 @@
   // ---------- CHAT WINDOW ----------
   function openChat(contactEmail, contactName) {
     selectedContact = { email: contactEmail, name: contactName };
+    // Highlight conversation
+    renderConversations();
+    // Update UI based on device
+    if (isMobile()) {
+      // On mobile: hide left column, show chat window
+      document.querySelector('.app-tabs').style.display = 'none';
+      document.querySelectorAll('.tab-pane').forEach(p => p.style.display = 'none');
+      document.getElementById('chat-window').classList.add('active-mobile');
+      document.getElementById('chat-window').style.display = 'flex';
+    }
+    // Update chat header and load messages
     document.getElementById('chat-contact-name').innerText = contactName;
-    document.getElementById('chat-window').style.display = 'flex';
-    document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+    document.getElementById('chat-input-area').style.display = 'flex';
+    // Hide placeholder if any
+    const placeholder = document.querySelector('.no-chat-placeholder');
+    if (placeholder) placeholder.style.display = 'none';
     loadMessages();
   }
 
   function closeChatWindow() {
-    document.getElementById('chat-window').style.display = 'none';
-    document.getElementById('chats-pane').classList.add('active');
     selectedContact = null;
+    if (isMobile()) {
+      // On mobile: hide chat window, show tabs and active pane
+      document.getElementById('chat-window').classList.remove('active-mobile');
+      document.getElementById('chat-window').style.display = 'none';
+      document.querySelector('.app-tabs').style.display = 'flex';
+      // Show the currently active tab pane
+      const activeTab = document.querySelector('.tab-btn.active').id.replace('tab-', '').replace('-btn', '');
+      document.getElementById(`${activeTab}-pane`).style.display = 'block';
+    } else {
+      // Desktop: clear selected contact and show placeholder
+      document.getElementById('chat-contact-name').innerText = '';
+      document.getElementById('messages-area').innerHTML = `<div class="no-chat-placeholder"><i class="fas fa-comments"></i><p>Select a chat to start messaging</p></div>`;
+      document.getElementById('chat-input-area').style.display = 'none';
+    }
     replyToMessage = null;
     document.getElementById('message-input').placeholder = 'Type a message';
   }
@@ -853,7 +1019,7 @@
   function renderMessages(messages) {
     const area = document.getElementById('messages-area');
     if (!messages.length) {
-      area.innerHTML = '<div style="text-align:center; color:#8696a0; margin-top:40px;">No messages yet 👋</div>';
+      area.innerHTML = '<div style="text-align:center; color:#8696a0; margin-top:60px;"><i class="fas fa-hand-peace" style="font-size:48px; margin-bottom:16px;"></i><p>Say hello! 👋</p></div>';
       return;
     }
     let html = '';
@@ -865,7 +1031,7 @@
       
       let replyHtml = '';
       if (msg.replyToId) {
-        replyHtml = `<div style="font-size:12px; color:#8696a0; border-left:2px solid #00a884; padding-left:8px; margin-bottom:4px;">↪️ Reply</div>`;
+        replyHtml = `<div style="font-size:12px; color:#8696a0; border-left:2px solid #00a884; padding-left:8px; margin-bottom:6px;">↪️ Reply</div>`;
       }
       
       let reactionsHtml = '';
@@ -884,10 +1050,10 @@
         <div>${messageText}</div>
         <div class="message-time">${formatTime(msg.timestamp)}</div>
         <div class="message-footer">
-          ${!isSent ? `<button class="message-action" onclick="replyTo('${msg.id}', '${escapeHTML(msg.message)}')"><i class="fas fa-reply"></i></button>` : ''}
-          ${isSent && !msg.deleted ? `<button class="message-action" onclick="editMessage('${msg.id}')"><i class="fas fa-edit"></i></button>` : ''}
-          ${isSent && !msg.deleted ? `<button class="message-action" onclick="deleteMessage('${msg.id}')"><i class="fas fa-trash"></i></button>` : ''}
-          <button class="message-action" onclick="openReactionModal('${msg.id}')"><i class="fas fa-smile"></i></button>
+          ${!isSent ? `<button class="message-action" onclick="replyTo('${msg.id}', '${escapeHTML(msg.message)}')"><i class="fas fa-reply"></i> Reply</button>` : ''}
+          ${isSent && !msg.deleted ? `<button class="message-action" onclick="editMessage('${msg.id}')"><i class="fas fa-edit"></i> Edit</button>` : ''}
+          ${isSent && !msg.deleted ? `<button class="message-action" onclick="deleteMessage('${msg.id}')"><i class="fas fa-trash"></i> Delete</button>` : ''}
+          <button class="message-action" onclick="openReactionModal('${msg.id}')"><i class="fas fa-smile"></i> React</button>
         </div>
         ${reactionsHtml}
       </div>`;
@@ -918,12 +1084,12 @@
   // ---------- MESSAGE ACTIONS ----------
   function replyTo(msgId, msgText) {
     replyToMessage = { id: msgId, text: msgText };
-    document.getElementById('message-input').placeholder = `Replying to: ${msgText.substring(0,30)}...`;
+    document.getElementById('message-input').placeholder = `↪️ Reply to: ${msgText.substring(0,30)}...`;
     document.getElementById('message-input').focus();
   }
 
   async function editMessage(msgId) {
-    const newText = prompt('Edit message:');
+    const newText = prompt('Edit your message:');
     if (newText && newText.trim()) {
       await apiRequest('editMessage', { messageId: msgId, newText: newText.trim() });
       loadMessages();
@@ -969,7 +1135,7 @@
   function renderContacts() {
     const container = document.getElementById('contacts-list');
     if (!contacts.length) {
-      container.innerHTML = '<div style="color:#8696a0; padding:20px; text-align:center;">No contacts yet</div>';
+      container.innerHTML = '<div style="color:#8696a0; padding:40px; text-align:center;"><i class="fas fa-address-book" style="font-size:48px; margin-bottom:16px;"></i><p>No contacts yet</p><p style="font-size:14px;">Search and add people to start chatting</p></div>';
       return;
     }
     let html = '';
@@ -982,7 +1148,10 @@
             <div class="contact-email">${escapeHTML(contact.email)}</div>
           </div>
         </div>
-        <button class="remove-contact" onclick="removeContact('${contact.email}')"><i class="fas fa-user-minus"></i></button>
+        <div class="contact-actions">
+          <button class="chat-contact-btn" onclick="openChat('${contact.email}', '${contact.name}')" title="Start chat"><i class="fas fa-comment"></i></button>
+          <button class="remove-contact" onclick="removeContact('${contact.email}')" title="Remove contact"><i class="fas fa-user-minus"></i></button>
+        </div>
       </div>`;
     });
     container.innerHTML = html;
@@ -997,11 +1166,16 @@
       const user = res.user;
       const isContact = contacts.some(c => c.email === user.email);
       contentDiv.innerHTML = `<div class="user-result">
-        <div><strong>${escapeHTML(user.name)}</strong><br><span style="color:#8696a0;">${escapeHTML(user.email)} • ${user.mobile}</span></div>
-        ${!isContact ? `<button class="btn" style="padding:8px 16px;" onclick="addContact('${user.email}')">Add Contact</button>` : '<span style="color:#00a884;">Already in contacts</span>'}
+        <div>
+          <strong style="font-size:18px;">${escapeHTML(user.name)}</strong><br>
+          <span style="color:#8696a0;">${escapeHTML(user.email)} • ${user.mobile}</span>
+        </div>
+        ${!isContact ? 
+          `<button class="btn" style="padding:10px 20px;" onclick="addContact('${user.email}')">Add Contact</button>` : 
+          '<span style="color:#00a884; font-weight:600;">✓ In contacts</span>'}
       </div>`;
     } else {
-      contentDiv.innerHTML = '<p style="color:#ff6b6b;">User not found</p>';
+      contentDiv.innerHTML = '<p style="color:#ff6b6b; text-align:center; padding:20px;">❌ User not found</p>';
     }
     document.getElementById('searchResultModal').classList.add('active');
   }
@@ -1020,11 +1194,16 @@
     if (confirm('Remove this contact?')) {
       await apiRequest('removeContact', { userEmail: currentUser.email, contactEmail });
       loadContacts();
+      // If currently chatting with this contact, close chat
+      if (selectedContact && selectedContact.email === contactEmail) {
+        closeChatWindow();
+      }
     }
   }
 
   function closeSearchModal() {
     document.getElementById('searchResultModal').classList.remove('active');
+    document.getElementById('contact-search-input').value = '';
   }
 
   // ---------- REFRESH & AUTO REFRESH ----------
@@ -1046,7 +1225,13 @@
   function formatTime(iso) {
     if (!iso) return '';
     const d = new Date(iso);
-    return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const now = new Date();
+    const diff = now - d;
+    if (diff < 86400000) {
+      return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    } else {
+      return d.toLocaleDateString([], { day: 'numeric', month: 'short' });
+    }
   }
   function escapeHTML(str) {
     return String(str).replace(/[&<>"]/g, function(c) {
@@ -1061,9 +1246,9 @@
     document.getElementById(id).innerText = msg;
   }
 
-  // ---------- INIT ----------
+  // ---------- INIT & EVENT LISTENERS ----------
   window.onload = function() {
-    // Tab switching inside auth
+    // Auth tab switching
     document.getElementById('login-tab').addEventListener('click', function() {
       this.classList.add('active');
       document.getElementById('register-tab').classList.remove('active');
@@ -1086,17 +1271,31 @@
     if (saved) {
       currentUser = JSON.parse(saved);
       document.getElementById('auth-container').style.display = 'none';
-      document.getElementById('main-container').style.display = 'flex';
+      document.getElementById('main-container').style.display = 'grid';
       updateUIAfterLogin();
       loadConversations();
       loadContacts();
+      updateChatWindowForDesktop();
     }
-  };
-</script>
-</body>
-</html>  
 
-  function filterConversations() {} // optional
+    // Listen for window resize to adapt layout
+    window.addEventListener('resize', function() {
+      if (currentUser) {
+        updateChatWindowForDesktop();
+        // On mobile, if chat window is open, keep left column hidden
+        if (isMobile() && selectedContact) {
+          document.querySelector('.app-tabs').style.display = 'none';
+          document.querySelectorAll('.tab-pane').forEach(p => p.style.display = 'none');
+          document.getElementById('chat-window').classList.add('active-mobile');
+        } else if (!isMobile() && selectedContact) {
+          // Desktop mode: ensure left column is visible
+          document.querySelector('.app-tabs').style.display = 'flex';
+          document.querySelectorAll('.tab-pane').forEach(p => p.style.display = ''); // restore based on active
+          // active pane will be shown by its class
+        }
+      }
+    });
+  };
 </script>
 </body>
 </html>

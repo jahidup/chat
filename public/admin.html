@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LightChat · Admin</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-white p-6">
+  <div class="max-w-6xl mx-auto">
+    <h1 class="text-3xl font-bold mb-6">🛡️ Admin Panel</h1>
+
+    <!-- Login Form -->
+    <div id="loginSection" class="max-w-md mx-auto bg-gray-800/50 backdrop-blur p-8 rounded-2xl border border-white/10">
+      <h2 class="text-xl mb-4">Admin Login</h2>
+      <input type="email" id="adminEmail" placeholder="Admin Email" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 mb-3">
+      <input type="password" id="adminPassword" placeholder="Password" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 mb-4">
+      <button id="loginBtn" class="w-full bg-blue-600 hover:bg-blue-700 py-3 rounded-lg">Login</button>
+      <p id="loginError" class="text-red-400 text-sm mt-3"></p>
+    </div>
+
+    <!-- Dashboard (hidden initially) -->
+    <div id="dashboard" class="hidden">
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl">All Users</h2>
+        <button id="logoutAdminBtn" class="text-gray-400 hover:text-white">Logout</button>
+      </div>
+      <div class="bg-gray-800/30 rounded-xl overflow-hidden border border-white/10">
+        <table class="w-full text-left">
+          <thead class="bg-gray-700/50">
+            <tr>
+              <th class="px-6 py-3">Name</th>
+              <th class="px-6 py-3">Email</th>
+              <th class="px-6 py-3">Joined</th>
+              <th class="px-6 py-3">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="userTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = window.location.origin;
+    let authHeaders = {};
+
+    const loginSection = document.getElementById('loginSection');
+    const dashboard = document.getElementById('dashboard');
+    const loginError = document.getElementById('loginError');
+
+    document.getElementById('loginBtn').addEventListener('click', async () => {
+      const email = document.getElementById('adminEmail').value.trim();
+      const password = document.getElementById('adminPassword').value;
+      if (!email || !password) {
+        loginError.textContent = 'Both fields required';
+        return;
+      }
+
+      authHeaders = {
+        'email': email,
+        'password': password
+      };
+
+      try {
+        const res = await fetch(`${API_BASE}/admin/users`, { headers: authHeaders });
+        if (!res.ok) throw new Error('Invalid credentials');
+        const users = await res.json();
+        showDashboard(users);
+      } catch (err) {
+        loginError.textContent = err.message;
+      }
+    });
+
+    function showDashboard(users) {
+      loginSection.classList.add('hidden');
+      dashboard.classList.remove('hidden');
+      renderUserTable(users);
+    }
+
+    function renderUserTable(users) {
+      const tbody = document.getElementById('userTableBody');
+      tbody.innerHTML = users.map(user => `
+        <tr class="border-t border-white/10">
+          <td class="px-6 py-3">${user.name}</td>
+          <td class="px-6 py-3">${user.email}</td>
+          <td class="px-6 py-3">${new Date(user.createdAt).toLocaleDateString()}</td>
+          <td class="px-6 py-3">
+            <button class="delete-user-btn text-red-400 hover:text-red-300" data-email="${user.email}">Delete</button>
+          </td>
+        </tr>
+      `).join('');
+
+      document.querySelectorAll('.delete-user-btn').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+          const email = e.target.dataset.email;
+          if (!confirm(`Delete user ${email} and all their messages?`)) return;
+          try {
+            await fetch(`${API_BASE}/admin/delete-user`, {
+              method: 'DELETE',
+              headers: { ...authHeaders, 'Content-Type': 'application/json' },
+              body: JSON.stringify({ email })
+            });
+            // Refresh list
+            const res = await fetch(`${API_BASE}/admin/users`, { headers: authHeaders });
+            const updated = await res.json();
+            renderUserTable(updated);
+          } catch (err) {
+            alert('Failed to delete user');
+          }
+        });
+      });
+    }
+
+    document.getElementById('logoutAdminBtn').addEventListener('click', () => {
+      authHeaders = {};
+      dashboard.classList.add('hidden');
+      loginSection.classList.remove('hidden');
+      document.getElementById('adminEmail').value = '';
+      document.getElementById('adminPassword').value = '';
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LightChat · Login</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-gradient-to-br from-gray-900 via-gray-800 to-black min-h-screen flex items-center justify-center p-4">
+  <div class="w-full max-w-md bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-8 shadow-2xl">
+    <h1 class="text-3xl font-bold text-white mb-2 text-center">💬 LightChat</h1>
+    <p class="text-gray-400 text-center mb-6">Login with OTP</p>
+
+    <!-- Step 1: Email & Name -->
+    <div id="step1">
+      <div class="mb-4">
+        <label class="block text-gray-300 mb-1 text-sm">Your Name</label>
+        <input type="text" id="name" placeholder="John Doe" class="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500">
+      </div>
+      <div class="mb-6">
+        <label class="block text-gray-300 mb-1 text-sm">Gmail Address</label>
+        <input type="email" id="email" placeholder="you@gmail.com" class="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500">
+      </div>
+      <button id="sendOtpBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-lg transition">Send OTP</button>
+      <p id="step1Error" class="text-red-400 text-sm mt-3 text-center"></p>
+    </div>
+
+    <!-- Step 2: OTP Verification (hidden initially) -->
+    <div id="step2" class="hidden">
+      <p class="text-gray-300 mb-4 text-center">Enter the 6-digit code sent to <span id="displayEmail" class="font-semibold text-white"></span></p>
+      <div class="mb-6">
+        <input type="text" id="otp" maxlength="6" placeholder="000000" class="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white text-center text-2xl tracking-widest placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500">
+      </div>
+      <button id="verifyOtpBtn" class="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-3 rounded-lg transition">Verify & Continue</button>
+      <button id="backToStep1" class="w-full mt-3 text-gray-400 hover:text-white text-sm">← Change email</button>
+      <p id="step2Error" class="text-red-400 text-sm mt-3 text-center"></p>
+    </div>
+
+    <p class="text-gray-500 text-xs text-center mt-6">Your messages are private and secure.</p>
+  </div>
+
+  <script>
+    const API_BASE = window.location.origin;
+    const step1 = document.getElementById('step1');
+    const step2 = document.getElementById('step2');
+    const nameInput = document.getElementById('name');
+    const emailInput = document.getElementById('email');
+    const otpInput = document.getElementById('otp');
+    const displayEmail = document.getElementById('displayEmail');
+    const step1Error = document.getElementById('step1Error');
+    const step2Error = document.getElementById('step2Error');
+
+    let currentEmail = '';
+
+    document.getElementById('sendOtpBtn').addEventListener('click', async () => {
+      const name = nameInput.value.trim();
+      const email = emailInput.value.trim();
+      if (!name || !email) {
+        step1Error.textContent = 'Name and email are required';
+        return;
+      }
+      if (!email.includes('@')) {
+        step1Error.textContent = 'Valid email required';
+        return;
+      }
+      step1Error.textContent = '';
+      
+      try {
+        const res = await fetch(`${API_BASE}/send-otp`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed to send OTP');
+        
+        currentEmail = email;
+        displayEmail.textContent = email;
+        step1.classList.add('hidden');
+        step2.classList.remove('hidden');
+      } catch (err) {
+        step1Error.textContent = err.message;
+      }
+    });
+
+    document.getElementById('verifyOtpBtn').addEventListener('click', async () => {
+      const otp = otpInput.value.trim();
+      if (otp.length !== 6) {
+        step2Error.textContent = 'Enter 6-digit OTP';
+        return;
+      }
+      step2Error.textContent = '';
+
+      try {
+        const res = await fetch(`${API_BASE}/verify-otp`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            email: currentEmail, 
+            otp, 
+            name: nameInput.value.trim() 
+          })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Verification failed');
+        
+        // Store user info in localStorage for chat page
+        localStorage.setItem('lightchat_user', JSON.stringify({ email: currentEmail, name: nameInput.value.trim() }));
+        window.location.href = '/chat';
+      } catch (err) {
+        step2Error.textContent = err.message;
+      }
+    });
+
+    document.getElementById('backToStep1').addEventListener('click', () => {
+      step2.classList.add('hidden');
+      step1.classList.remove('hidden');
+    });
+  </script>
+</body>
+</html>

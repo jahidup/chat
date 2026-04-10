@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LightChat · Messages</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body class="bg-gray-900 text-white h-screen flex">
+  <!-- Sidebar -->
+  <div class="w-80 bg-gray-800/50 backdrop-blur-sm border-r border-white/10 flex flex-col">
+    <div class="p-4 border-b border-white/10 flex items-center justify-between">
+      <div>
+        <h2 class="text-xl font-bold">💬 LightChat</h2>
+        <p id="currentUserName" class="text-sm text-gray-400"></p>
+      </div>
+      <button id="logoutBtn" class="text-gray-400 hover:text-white"><i class="fas fa-sign-out-alt"></i></button>
+    </div>
+    <div class="p-3">
+      <input type="text" id="searchInput" placeholder="Search users..." class="w-full bg-gray-700/50 border border-gray-600 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+    </div>
+    <div id="userList" class="flex-1 overflow-y-auto p-2 space-y-1">
+      <!-- User list will be populated here -->
+    </div>
+    <div class="p-4 border-t border-white/10">
+      <button id="deleteAccountBtn" class="w-full text-red-400 hover:text-red-300 text-sm py-2"><i class="fas fa-trash-alt mr-2"></i>Delete Account</button>
+    </div>
+  </div>
+
+  <!-- Chat Area -->
+  <div class="flex-1 flex flex-col">
+    <div id="chatHeader" class="p-4 border-b border-white/10 bg-gray-800/30">
+      <h3 id="chatWithName" class="text-lg font-semibold">Select a user</h3>
+      <p id="chatWithEmail" class="text-sm text-gray-400"></p>
+    </div>
+    <div id="messageContainer" class="flex-1 overflow-y-auto p-4 space-y-3">
+      <div class="text-center text-gray-500 mt-10">👋 Select a contact to start messaging</div>
+    </div>
+    <div id="messageInputArea" class="p-4 border-t border-white/10 bg-gray-800/30 hidden">
+      <form id="messageForm" class="flex gap-2">
+        <input type="text" id="messageInput" placeholder="Type a message..." class="flex-1 bg-gray-700/50 border border-gray-600 rounded-full px-5 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500">
+        <button type="submit" class="bg-blue-600 hover:bg-blue-700 rounded-full w-12 h-12 flex items-center justify-center"><i class="fas fa-paper-plane"></i></button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = window.location.origin;
+    const currentUser = JSON.parse(localStorage.getItem('lightchat_user'));
+    if (!currentUser) window.location.href = '/';
+
+    document.getElementById('currentUserName').textContent = currentUser.name;
+    let selectedChatUser = null; // { email, name }
+    let pollingInterval = null;
+
+    // Logout
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+      localStorage.removeItem('lightchat_user');
+      window.location.href = '/';
+    });
+
+    // Delete account
+    document.getElementById('deleteAccountBtn').addEventListener('click', async () => {
+      if (!confirm('Delete your account and all messages? This cannot be undone.')) return;
+      try {
+        await fetch(`${API_BASE}/delete-account`, {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: currentUser.email })
+        });
+        localStorage.removeItem('lightchat_user');
+        window.location.href = '/';
+      } catch (err) {
+        alert('Failed to delete account');
+      }
+    });
+
+    // Load users
+    async function loadUsers(searchTerm = '') {
+      try {
+        const res = await fetch(`${API_BASE}/users`);
+        const users = await res.json();
+        const filtered = users.filter(u => 
+          u.email !== currentUser.email && 
+          (u.name.toLowerCase().includes(searchTerm.toLowerCase()) || u.email.toLowerCase().includes(searchTerm.toLowerCase()))
+        );
+        renderUserList(filtered);
+      } catch (err) {
+        console.error('Failed to load users', err);
+      }
+    }
+
+    function renderUserList(users) {
+      const container = document.getElementById('userList');
+      if (users.length === 0) {
+        container.innerHTML = '<p class="text-gray-500 text-center py-4">No users found</p>';
+        return;
+      }
+      container.innerHTML = users.map(user => `
+        <div class="user-item p-3 rounded-lg hover:bg-white/5 cursor-pointer transition flex items-center gap-3" data-email="${user.email}" data-name="${user.name}">
+          <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold">${user.name.charAt(0).toUpperCase()}</div>
+          <div>
+            <p class="font-medium">${user.name}</p>
+            <p class="text-xs text-gray-400">${user.email}</p>
+          </div>
+        </div>
+      `).join('');
+
+      document.querySelectorAll('.user-item').forEach(el => {
+        el.addEventListener('click', () => selectUser(el.dataset.email, el.dataset.name));
+      });
+    }
+
+    function selectUser(email, name) {
+      selectedChatUser = { email, name };
+      document.getElementById('chatWithName').textContent = name;
+      document.getElementById('chatWithEmail').textContent = email;
+      document.getElementById('messageInputArea').classList.remove('hidden');
+      loadMessages();
+      if (pollingInterval) clearInterval(pollingInterval);
+      pollingInterval = setInterval(loadMessages, 2000);
+    }
+
+    async function loadMessages() {
+      if (!selectedChatUser) return;
+      try {
+        const res = await fetch(`${API_BASE}/messages/${currentUser.email}?with=${selectedChatUser.email}`);
+        const messages = await res.json();
+        renderMessages(messages);
+      } catch (err) {
+        console.error('Failed to load messages', err);
+      }
+    }
+
+    function renderMessages(messages) {
+      const container = document.getElementById('messageContainer');
+      if (messages.length === 0) {
+        container.innerHTML = '<div class="text-center text-gray-500 mt-10">No messages yet. Say hello! 👋</div>';
+        return;
+      }
+      container.innerHTML = messages.map(msg => {
+        const isSentByMe = msg.senderEmail === currentUser.email;
+        return `
+          <div class="flex ${isSentByMe ? 'justify-end' : 'justify-start'}">
+            <div class="max-w-[70%] rounded-2xl px-4 py-2 ${isSentByMe ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-100'}">
+              <p>${escapeHtml(msg.message)}</p>
+              <p class="text-xs opacity-70 mt-1">${new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
+            </div>
+          </div>
+        `;
+      }).join('');
+      container.scrollTop = container.scrollHeight;
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    document.getElementById('messageForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const input = document.getElementById('messageInput');
+      const message = input.value.trim();
+      if (!message || !selectedChatUser) return;
+
+      try {
+        await fetch(`${API_BASE}/send-message`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            senderEmail: currentUser.email,
+            receiverEmail: selectedChatUser.email,
+            message
+          })
+        });
+        input.value = '';
+        loadMessages();
+      } catch (err) {
+        alert('Failed to send message');
+      }
+    });
+
+    document.getElementById('searchInput').addEventListener('input', (e) => {
+      loadUsers(e.target.value);
+    });
+
+    // Initial load
+    loadUsers();
+
+    // Cleanup polling on page unload
+    window.addEventListener('beforeunload', () => {
+      if (pollingInterval) clearInterval(pollingInterval);
+    });
+  </script>
+</body>
+</html>
